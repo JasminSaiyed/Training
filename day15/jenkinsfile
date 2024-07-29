@@ -1,0 +1,38 @@
+pipeline {
+    agent any
+
+    environment {
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials')
+    }
+
+    stages {
+        stage('Clone Repository') {
+            steps {
+                git 'https://github.com/username/repository.git'
+            }
+        }
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    dockerImage = docker.build("username/repository:latest")
+                }
+            }
+        }
+        stage('Push Docker Image') {
+            steps {
+                script {
+                    docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-credentials') {
+                        dockerImage.push()
+                    }
+                }
+            }
+        }
+        stage('Deploy Container') {
+            steps {
+                script {
+                    sh 'docker run -d --name java-app -p 8080:8080 username/repository:latest'
+                }
+            }
+        }
+    }
+}

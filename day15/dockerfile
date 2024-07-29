@@ -1,14 +1,5 @@
-# Use an official OpenJDK runtime as a parent image
-FROM openjdk:8-jdk-alpine
+FROM openjdk:11-jre-slim
+COPY target/myapp.jar /usr/app/
+WORKDIR /usr/app
+ENTRYPOINT ["java", "-jar", "myapp.jar"]
 
-# Set the working directory in the container
-WORKDIR /app
-
-# Copy the current directory contents into the container at /app
-COPY . /app
-
-# Compile the Java application
-RUN javac HelloWorld.java
-
-# Run the application
-CMD ["java", "HelloWorld"]
