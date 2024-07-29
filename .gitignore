@@ -1,0 +1,14 @@
+# Logs
+logs/
+*.log
+
+# Temporary files
+tmp/
+*.tmp
+
+# Node modules (if using Node.js)
+node_modules/
+
+# IDE specific files
+.vscode/
+.idea/
