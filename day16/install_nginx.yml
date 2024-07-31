@@ -1,0 +1,75 @@
+- hosts: web
+  name: Installing apache2 server
+  become: yes
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Install Apache2
+      apt:
+        name: apache2
+        state: present
+---
+- hosts: web
+  name: Configure Apache2 service
+  become: yes
+  tasks:
+    - name: Ensure Apache2 is running and enabled on boot
+      service:
+        name: apache2
+        state: started
+        enabled: yes
+
+    - name: Customising configuration for Apache2
+      copy:
+        dest: /etc/apache2/sites-available/000-default.conf
+        content: |
+          <VirtualHost *:80>
+              ServerAdmin webmaster@localhost
+              DocumentRoot /var/www/html
+              ErrorLog ${APACHE_LOG_DIR}/error.log
+              CustomLog ${APACHE_LOG_DIR}/access.log combined
+              # Custom configuration here
+              LogLevel info
+          </VirtualHost>
+
+    - name: Reloading Apache2
+      service:
+        name: apache2
+        state: reloaded
+---
+- hosts: web
+  name: Managing files on managed nodes
+  become: yes
+  tasks:
+    - name: Create file if not present
+      ansible.builtin.file:
+        path: /home/ubuntu/file.txt
+        state: touch
+
+    - name: Create file with content
+      ansible.builtin.copy:
+        dest: /home/ubuntu/file_with_content.txt
+        content: "This is the content of the file.\n"
+
+    - name: Delete a file
+      ansible.builtin.file:
+        path: /home/ubuntu/abc.txt
+        state: absent
+
+    - name: Modify a file
+      ansible.builtin.lineinfile:
+        path: /home/ubuntu/file_with_content.txt
+        line: "New line to be added to the file."
+
+    - name: Ensure a directory is present
+      ansible.builtin.file:
+        path: /home/ubuntu/.ssh
+        state: directory
+
+    - name: Delete a directory
+      ansible.builtin.file:
+        path: /home/ubuntu/abc
+        state: absent
+

@@ -1,0 +1,8 @@
+---
+-host: web
+ tasks:
+  -name :
+   copy:
+   src: index.html
+   dest:/var/wwww/html/index.html
+

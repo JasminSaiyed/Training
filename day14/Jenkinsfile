@@ -4,7 +4,7 @@ pipeline{
 
     environment{
         dockerImage = ''
-        registry = ''
+        registry = 'jasmin001/day15'
         // registryCredentials = 'Docker'
     }
 

@@ -1,0 +1,17 @@
+- name: playbook to creating, deleting, and modifying files on managed nodes
+  hosts: all
+  tasks:
+    - name: Create file
+      file:
+        path: /home/ubuntu/day16-tasks/file1.txt
+        state: touch
+    - name: Modifying file
+      lineinfile:
+        path: /home/ubuntu/day16-tasks/file1.txt
+        line: This is the new line added
+        state: present
+        create: true
+    - name: Delete file
+      file:
+        path: /home/ubuntu/day16-tasks/file1.txt
+        state: absent
