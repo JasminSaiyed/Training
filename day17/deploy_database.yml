@@ -1,0 +1,71 @@
+- name: setup Mysql with database db and remote login
+  become: yes
+  hosts: workers
+
+  vars_files:
+    - vars.yml
+
+  tasks:
+    - name: Installing Mysql  and dependencies
+      package:
+       name: "{{item}}"
+       state: present
+       update_cache: yes
+      loop:
+       - mysql-server
+       - mysql-client
+       - python3-mysqldb
+       - libmysqlclient-dev
+      become: yes
+
+    - name: start and enable mysql service
+      service:
+        name: mysql
+        state: started
+        enabled: yes
+
+    - name: creating mysql user
+      mysql_user:
+        name: "{{db_user}}"
+        password: "{{db_pass}}"
+        priv: '*.*:ALL'
+        host: '%'
+        state: present
+
+    - name: creating database
+      mysql_db:
+        name: "{{db_name}}"
+        state: present
+
+    - name: Enable remote login to mysql
+      lineinfile:
+         path: /etc/mysql/mysql.conf.d/mysqld.cnf
+         regexp: '^bind-address'
+         line: 'bind-address = 0.0.0.0'
+         backup: yes
+      notify:
+         - Restart mysql
+
+    - name: Create Backup Directory
+      file:
+        path: /var/backups/mysql
+        state: directory
+
+    - name: Create Backup Script
+      copy:
+        src: scripts/backup.sh
+        dest: ~/
+        mode: 0755
+
+    - name: Create a cron job
+      cron:
+        name: "MySQL Backup"
+        minute: "2"
+        hour: "0"
+        job: "~/backup.sh"
+
+  handlers:
+    - name: Restart mysql
+      service:
+        name: mysql
+        state: restarted
