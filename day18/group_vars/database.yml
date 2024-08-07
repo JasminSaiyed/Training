@@ -1,0 +1,5 @@
+# group_vars/database.yml
+---
+db_name: my_database
+db_user: db_user
+db_password: db_password

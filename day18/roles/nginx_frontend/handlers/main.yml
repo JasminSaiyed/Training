@@ -1,0 +1,7 @@
+---
+# handlers file for nginx_frontend
+- name: restart nginx
+  service:
+    name: nginx
+    state: restarted
+  become: true

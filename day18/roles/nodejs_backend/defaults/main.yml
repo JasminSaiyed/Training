@@ -1,0 +1,7 @@
+# roles of backend main.yml
+---
+nodejs_version: "14.x"
+app_directory: "/opt/nodejs_app"
+app_user: "nodejs"
+app_group: "nodejs"
+

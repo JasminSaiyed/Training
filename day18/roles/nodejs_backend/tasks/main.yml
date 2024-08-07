@@ -1,0 +1,62 @@
+# roles of nodejs_backend main.yml
+---
+- name: Add NodeSource APT repository
+  apt_key:
+    url: https://deb.nodesource.com/gpgkey/nodesource.gpg.key
+    state: present
+  become: true
+
+- name: Add NodeSource repository
+  apt_repository:
+    repo: deb https://deb.nodesource.com/node_14.x {{ ansible_distribution_release }} main
+    state: present
+  become: true
+
+- name: Update APT package list
+  apt:
+    update_cache: yes
+  become: true
+
+- name: Ensure Node.js is installed
+  apt:
+    name: nodejs
+    state: present
+  become: true
+
+- name: Copy Node.js application files
+  copy:
+    src: /path/to/your/app/
+    dest: /opt/nodejs_app/
+    owner: nodejs
+    group: nodejs
+    mode: 0755
+  become: true
+
+- name: Install Node.js dependencies only if the host is part of backend group
+  apt:
+    name: nodejs
+    state: present
+  when: "'backend' in group_names"
+
+- name: Install npm only if the host is part of backend group
+  apt:
+    name: npm
+    state: present
+  when: "'backend' in group_names"
+#- name: Install Node.js dependencies
+ # npm:
+   # path: /opt/nodejs_app
+   # state: present
+ # become: true
+
+- name: Start Node.js application
+  systemd:
+    name: nodejs_app
+    enabled: yes
+    state: started
+    daemon_reload: yes
+    exec_start: /usr/bin/node /opt/nodejs_app/index.js
+    user: nodejs
+    group: nodejs
+  become: true
+

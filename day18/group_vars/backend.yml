@@ -1,0 +1,8 @@
+# group_vars/backend.yml
+---
+nodejs_user: nodejs
+nodejs_group: nodejs
+app_dir: /opt/nodejs_app
+app_name: my_nodejs_app
+app_port: 3000
+app_env: production

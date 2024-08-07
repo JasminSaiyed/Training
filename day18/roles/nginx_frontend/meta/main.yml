@@ -1,0 +1,25 @@
+# roles/nginx_frontend/meta/main.yml
+---
+galaxy_info:
+  author: YourName
+  description: Role to install and configure Nginx as a frontend web server.
+  company: YourCompany
+  license: MIT
+  min_ansible_version: 2.9
+
+  platforms:
+    - name: Debian
+      versions:
+        - buster
+        - bullseye
+    - name: Ubuntu
+      versions:
+        - bionic
+        - focal
+        - jammy
+
+  categories:
+    - web
+
+dependencies: []
+

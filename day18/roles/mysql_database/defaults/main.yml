@@ -1,0 +1,11 @@
+---
+# defaults file for mysql_database
+mysql_root_password: "root_password"
+mysql_databases:
+  - name: "app_db"
+    encoding: "utf8"
+mysql_users:
+  - name: "app_user"
+    password: "user_password"
+    priv: "app_db.*:ALL"
+

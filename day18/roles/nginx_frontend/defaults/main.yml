@@ -1,0 +1,6 @@
+---
+# defaults file for nginx_frontend
+nginx_user: www-data
+nginx_worker_processes: auto
+nginx_error_log: /var/log/nginx/error.log
+nginx_access_log: /var/log/nginx/access.log

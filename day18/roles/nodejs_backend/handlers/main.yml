@@ -1,0 +1,7 @@
+# handlers file for nodejs_backend
+---
+- name: restart nodejs_app
+  systemd:
+    name: nodejs_app
+    state: restarted
+  become: true

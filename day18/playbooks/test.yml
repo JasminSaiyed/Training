@@ -1,0 +1,26 @@
+# playbooks/test.yml
+---
+- name: Test Three-Tier Web Application Deployment
+  hosts: all
+  tasks:
+    - name: Ensure MySQL service is running
+      service:
+        name: mysql
+        state: started
+      when: "'database' in group_names"
+
+    - name: Ensure Node.js application is running
+      shell: systemctl is-active nodejs_app
+      register: nodejs_status
+      changed_when: false
+      when: "'backend' in group_names"
+
+    - name: Check Node.js application status
+      debug:
+        msg: "Node.js app is {{ nodejs_status.stdout }}"
+
+    - name: Ensure Nginx service is running
+      service:
+        name: nginx
+        state: started
+      when: "'frontend' in group_names"

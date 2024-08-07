@@ -1,0 +1,15 @@
+# roles/nodejs_backend/templates/nodejs_app.service.j2
+[Unit]
+Description=Node.js Application
+
+[Service]
+ExecStart=/usr/bin/node /var/www/nodejs_app/app.js
+Restart=always
+User=nobody
+Group=nogroup
+Environment=PATH=/usr/bin:/usr/local/bin
+Environment=NODE_ENV=production
+WorkingDirectory=/var/www/nodejs_app
+
+[Install]
+WantedBy=multi-user.target

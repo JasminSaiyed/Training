@@ -1,0 +1,41 @@
+# playbooks/deploy.yml
+---
+- name: Deploy Three-Tier Web Application
+  hosts: all
+  become: true
+  roles:
+    - role: mysql_database
+      when: "'database' in group_names"
+    - role: nodejs_backend
+      when: "'backend' in group_names"
+    - role: nginx_frontend
+      when: "'frontend' in group_names"
+
+  tasks:
+    - name: Ensure common tools are installed
+      apt:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - git
+        - curl
+
+    - name: Ensure nginx is installed (frontend only)
+      apt:
+        name: nginx
+        state: present
+      when: "'frontend' in group_names"
+
+    - name: Ensure backend application is running (backend only)
+      service:
+        name: backend-app
+        state: started
+      when: "'backend' in group_names"
+
+    - name: Ensure PostgreSQL is installed (database only)
+      apt:
+        name: postgresql
+        state: present
+      when: "'database' in group_names"
+
+

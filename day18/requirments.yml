@@ -1,0 +1,9 @@
+# requirements.yml
+# requirements.yml
+- src: geerlingguy.nginx
+  name: frontend
+- src: geerlingguy.nodejs
+  name: backend
+- src: geerlingguy.mysql
+  name: database
+

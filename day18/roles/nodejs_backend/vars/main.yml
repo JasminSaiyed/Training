@@ -1,0 +1,6 @@
+---
+# vars file for nodejs_backend
+app_name: my_nodejs_app
+app_port: 3000
+app_env: production
+
