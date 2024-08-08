@@ -1,5 +1,6 @@
 - name: Docker Container Creation
   hosts: localhost
+
   tasks:
   - name: Create and start Docker container
     community.docker.docker_container:
