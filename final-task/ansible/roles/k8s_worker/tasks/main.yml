@@ -1,0 +1,5 @@
+---
+- name: Join the worker node to the Kubernetes cluster
+  ansible.builtin.command:
+    cmd: "{{ hostvars[groups['master_nodes'][0]].kubeadm_join_cmd }}"
+  when: hostvars[groups['master_nodes'][0]].kubeadm_join_cmd is defined

@@ -1,0 +1,31 @@
+pipeline {
+    agent any
+    stages {
+        stage('Checkout') {
+            steps {
+                git 'https://github.com/your-repo/your-app.git'
+            }
+        }
+        stage('Build') {
+            steps {
+                script {
+                    sh 'docker build -t <your-docker-repo>/my-ecommerce-app:latest .'
+                }
+            }
+        }
+        stage('Push') {
+            steps {
+                script {
+                    sh 'docker push <your-docker-repo>/my-ecommerce-app:latest'
+                }
+            }
+        }
+        stage('Deploy') {
+            steps {
+                script {
+                    sh 'helm upgrade --install my-app ./helm/my-app'
+                }
+            }
+        }
+    }
+}

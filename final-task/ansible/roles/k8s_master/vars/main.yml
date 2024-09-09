@@ -1,0 +1,8 @@
+---
+# vars file for roles/k8s_master
+helm_version: "3.11.1"
+helm_chart_name: "mychart"
+helm_chart_repo: "https://charts.bitnami.com/bitnami"
+helm_chart_version: "1.0.0"
+release_name: "myrelease"
+namespace: "default"

@@ -1,0 +1,21 @@
+plugin: aws_ec2
+regions:
+  - ap-northeast-2
+filters:
+  instance-state-name:
+    - running
+  tag:Name:
+    - Jasmin-control
+    - Jasmin-worker1
+  tag:Node: 
+    - Worker
+    - Master
+    -Worker
+hostnames:
+  - ip-address
+compose:
+  instance_id: instance_id
+  ec2_region: placement.region
+groups:
+  master_nodes: "'Master' in tags['Node']"
+  worker_nodes: "'Worker' in tags['Node']"

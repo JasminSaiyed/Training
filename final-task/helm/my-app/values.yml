@@ -1,0 +1,6 @@
+image:
+  repository: <your-docker-repo>/my-ecommerce-app
+  tag: latest
+
+s3:
+  bucket: "my-static-assets-bucket"

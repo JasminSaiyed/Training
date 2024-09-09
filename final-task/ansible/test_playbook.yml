@@ -1,0 +1,11 @@
+---
+- name: Test EC2 Inventory with Dynamic Data
+  hosts: all
+  tasks:
+    - name: Print hostname and IP
+      debug:
+        msg: "Host: {{ inventory_hostname }} with instance-id: {{ instance_id }}"
+
+    - name: Print instance tags
+      debug:
+        msg: "Instance tags: {{ tags }}"

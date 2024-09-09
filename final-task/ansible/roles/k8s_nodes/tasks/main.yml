@@ -1,0 +1,86 @@
+---
+- name: Install aptitude
+  apt:
+    name: aptitude
+    state: latest
+    update_cache: true
+
+- name: Update and upgrade all packages to the latest version
+  apt:
+    update_cache: true
+    upgrade: dist
+    cache_valid_time: 3600
+
+- name: Install required packages
+  apt:
+    name: "{{ packages }}"
+    state: present
+  vars:
+    packages:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - gnupg
+      - gpg
+      - python3-apt
+      - software-properties-common
+      - docker.io
+
+- name: Enable and start Docker services
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    enabled: true
+    state: started
+  loop:
+    - docker.service
+    - containerd.service
+
+
+# Installing Kubeadm
+
+- name: Ensure /etc/apt/keyrings directory exists
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
+    
+- name: Get Kubernetes package key
+  shell: curl -fsSL {{ k8s_url_apt_key }} | gpg --dearmor -o {{ k8s_gpgpath }}
+  args:
+    creates: "{{ k8s_gpgpath }}"
+ 
+- name: Install Kubernetes repository
+  apt_repository:
+    filename: kubernetes
+    repo: "deb [signed-by={{ k8s_gpgpath }}] {{ k8s_repository }} /"
+ 
+
+- name: Update APT package index
+  ansible.builtin.apt:
+    update_cache: yes
+
+- name: Install Kubernetes components
+  ansible.builtin.apt:
+    name:
+      - kubelet
+      - kubeadm
+      - kubectl
+    state: present
+
+- name: Hold Kubernetes packages to prevent upgrades
+  ansible.builtin.dpkg_selections:
+    name: "{{ item }}"
+    selection: hold
+  loop:
+    - kubelet
+    - kubeadm
+    - kubectl
+
+- name: Disable swap (required by kubelet)
+  command: swapoff -a
+
+- name: Disable swap in fstab
+  replace:
+    path: /etc/fstab
+    regexp: '^\s*([^#\s]\S+)\s+\S+\s+swap\s+\S+\s+(.*)$'
+    replace: '# \1 swap \2'

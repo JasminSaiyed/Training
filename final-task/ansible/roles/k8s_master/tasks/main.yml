@@ -1,0 +1,80 @@
+---
+- name: Initialize Kubernetes master node with kubeadm
+  ansible.builtin.command:
+    cmd: kubeadm init
+  register: kubeadm_output
+
+- name: Create .kube directory for regular user
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.kube"
+    state: directory
+    mode: '0755'
+
+- name: Copy Kubernetes admin.conf to user's kube config
+  ansible.builtin.copy:
+    src: /etc/kubernetes/admin.conf
+    dest: "{{ ansible_env.HOME }}/.kube/config"
+    remote_src: yes
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0644'
+
+- name: Deploy Calico network plugin
+  ansible.builtin.command:
+    cmd: kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.25.0/manifests/calico.yaml
+  environment:
+    KUBECONFIG: "{{ ansible_env.HOME }}/.kube/config"
+
+- name: Get kubeadm join command
+  ansible.builtin.command:
+    cmd: kubeadm token create --print-join-command
+  register: join_command
+  
+- name: Save join command to a fact
+  ansible.builtin.set_fact:
+    kubeadm_join_cmd: "{{ join_command.stdout }}"
+  
+- name: Display kubeadm join command
+  ansible.builtin.debug:
+    msg: "{{ kubeadm_join_cmd }}"
+
+
+# installation of helm in master node
+# Helm char installation using Helm chart
+- name: Download Helm binary
+  get_url:
+    url: "https://get.helm.sh/helm-v{{ helm_version }}-linux-amd64.tar.gz"
+    dest: "/tmp/helm.tar.gz"
+
+- name: Extract Helm binary
+  unarchive:
+    src: "/tmp/helm.tar.gz"
+    dest: "/usr/local/bin/"
+    remote_src: yes
+
+- name: Verify Helm installation
+  command: helm version --short
+  register: helm_version_output
+  changed_when: false
+
+- name: Add Helm repository
+  command: helm repo add myrepo {{ helm_chart_repo }}
+  register: helm_repo_add_output
+  changed_when: "'already exists' not in helm_repo_add_output.stderr"
+
+- name: Update Helm repositories
+  command: helm repo update
+
+- name: Install Helm chart
+  command: helm upgrade --install {{ release_name }} myrepo/{{ helm_chart_name }} --version {{ helm_chart_version }} --namespace {{ namespace }}
+  register: helm_install_output
+  changed_when: "'already exists' not in helm_install_output.stderr"
+
+- name: Check Helm release status
+  command: helm status {{ release_name }} --namespace {{ namespace }}
+  register: helm_status_output
+  changed_when: false
+
+- name: Display Helm release status
+  debug:
+    msg: "{{ helm_status_output.stdout }}"
